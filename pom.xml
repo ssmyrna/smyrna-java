@@ -6,7 +6,7 @@
 
     <groupId>io.github.ssmyrna</groupId>
     <artifactId>smyrna-java</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packaging>jar</packaging>
     <name>smyrna-java</name>
     <description>Test Automation Framework</description>
