@@ -9,13 +9,17 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
+
 public class PrepareRequest {
+    private static final Logger logger = LoggerFactory.getLogger(PrepareRequest.class);
+
     public static RequestSpecification request;
     public static Response response;
 
@@ -27,7 +31,7 @@ public class PrepareRequest {
             RestAssured.baseURI = baseUrl + url;
             request = RestAssured.given();
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
 
     }
@@ -52,9 +56,9 @@ public class PrepareRequest {
                     response = request.when().log().all().delete();
                     break;
             }
-            log.info("Response Body = " + response.asString());
+            logger.info("Response Body = " + response.asString());
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
 
 
@@ -66,11 +70,15 @@ public class PrepareRequest {
         try {
             List<Map<String, String>> map = dt.asMaps(String.class, String.class);
             for (Map<String, String> value : map) {
-                request.headers(value.get("key"), value.get("value"));
+                if (value.get("value").equals("access_token")) {
+                    request.headers(value.get("key"), ConfigReader.get("access.token"));
+                } else {
+                    request.headers(value.get("key"), value.get("value"));
+                }
             }
-            log.info("Headers Is Ready.");
+            logger.info("Headers Is Ready.");
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
     }
 
@@ -88,9 +96,9 @@ public class PrepareRequest {
                     Helper.jo.set(value.get("key"), Helper.dataConversionBoolean(value.get("value")));
                 }
             }
-            log.info(path + " Request Body Is Ready.");
+            logger.info(path + " Request Body Is Ready.");
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
 
 
@@ -101,9 +109,9 @@ public class PrepareRequest {
         try {
             Helper.jsonEdit(request);
             Helper.jo.delete(field);
-            log.info(field + " Field Remove On" + request + " Body");
+            logger.info(field + " Field Remove On" + request + " Body");
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
 
 
@@ -116,9 +124,9 @@ public class PrepareRequest {
             for (Map<String, String> value : map) {
                 request.queryParam(value.get("key"), value.get("value"));
             }
-            log.info("Params Is Ready.");
+            logger.info("Params Is Ready.");
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: " + e);
         }
     }
 }

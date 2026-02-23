@@ -5,25 +5,25 @@ import com.jayway.jsonpath.JsonPath;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
-import lombok.extern.slf4j.Slf4j;
+import org.testng.Assert;
 import steps.PrepareRequest;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-@Slf4j
 public class Helper {
-
+    private static final Logger logger = LoggerFactory.getLogger(Helper.class);
     public static io.restassured.path.json.JsonPath type;
     public static DocumentContext jo;
 
 
     public static void jsonEdit(String path) throws Exception {
         try {
-            type = new io.restassured.path.json.JsonPath(readFileAsString("src/test/java/objects/" + path + ".json"));
-            jo = JsonPath.parse(readFileAsString("src/test/java/objects/" + path + ".json"));
+            type = new io.restassured.path.json.JsonPath(readFileAsString("src/test/java/requests/" + path + ".json"));
+            jo = JsonPath.parse(readFileAsString("src/test/java/requests/" + path + ".json"));
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
         }
     }
 
@@ -39,7 +39,7 @@ public class Helper {
             }
             return "Wrong";
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
             return "Fail";
         }
     }
@@ -56,7 +56,8 @@ public class Helper {
             }
             return "Wrong";
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
+            Assert.fail();
             return "Fail";
         }
 
@@ -67,7 +68,7 @@ public class Helper {
         try {
             return new String(Files.readAllBytes(Paths.get(file)));
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
             return null;
         }
 
@@ -86,7 +87,7 @@ public class Helper {
                     return value;
             }
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
             return null;
         }
 
@@ -99,7 +100,7 @@ public class Helper {
             } else
                 return Integer.valueOf(value);
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
             return null;
         }
     }
@@ -111,18 +112,18 @@ public class Helper {
             } else
                 return Boolean.valueOf(value);
         } catch (Exception e) {
-            log.error("Error Message: " + e);
+            logger.error("Error Message: {}", String.valueOf(e));
             return null;
         }
     }
 
     @Before
     public static void before(Scenario s) {
-        log.info(s.getName() + " Scenario started.");
+        logger.info(s.getName() + " Scenario started.");
     }
 
     @After
     public static void after(Scenario s) {
-        log.info(s.getName() + " Scenario ended.");
+        logger.info(s.getName() + " Scenario ended.");
     }
 }

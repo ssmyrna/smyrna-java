@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <!-- ANSI renkleri aktif et -->
+    <Properties>
+        <Property name="log4j.skipJansi">false</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss} %-5level %logger{36} - %msg%n}{INFO=blue, WARN=yellow, ERROR=red, DEBUG=cyan, TRACE=magenta}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

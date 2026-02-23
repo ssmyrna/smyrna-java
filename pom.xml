@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.ssmyrna</groupId>
+    <groupId>io.github.ssmyrna</groupId>
     <artifactId>smyrna-java</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <packaging>jar</packaging>
     <name>smyrna-java</name>
     <description>Test Automation Framework</description>
@@ -53,7 +53,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.1.0</version>  <!-- Güncellenmiş sürüm -->
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -103,7 +103,7 @@
 
 
     <properties>
-        <gpg.executable>C:\Users\mustafa.maden\Downloads\cmder\vendor\git-for-windows\usr\bin\gpg.exe</gpg.executable>
+        <gpg.executable>/opt/homebrew/bin/gpg</gpg.executable>
         <maven.compiler.version>3.8.1</maven.compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
@@ -117,6 +117,8 @@
         <lombok>1.18.30</lombok>
         <jayway>2.6.0</jayway>
         <cucumber-core>7.14.0</cucumber-core>
+        <slf4j.version>2.0.12</slf4j.version>
+        <log4j2.version>2.23.1</log4j2.version>
     </properties>
 
     <dependencies>
@@ -141,11 +143,6 @@
             <version>${gson}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.simple.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber-testng}</version>
@@ -166,9 +163,24 @@
             <version>${lombok}</version>
         </dependency>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.11</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.13</version>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
         </dependency>
     </dependencies>
 
