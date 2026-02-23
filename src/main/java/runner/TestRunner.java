@@ -12,7 +12,7 @@ import steps.BaseSteps;
 
 @CucumberOptions(
         features = "src/test/java/features",
-        glue = {"steps","helper"}, plugin = {"pretty", "json:target/cucumber-report.json"}
+        glue = {"io.github.ssmyrna.steps","io.github.ssmyrna.helper"}, plugin = {"pretty", "json:target/cucumber-report.json"}
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
     private static final Logger logger = LoggerFactory.getLogger(BaseSteps.class);
