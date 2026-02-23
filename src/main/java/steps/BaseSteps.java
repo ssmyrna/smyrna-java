@@ -1,8 +1,10 @@
 package steps;
 
+import com.jayway.jsonpath.DocumentContext;
 import config.ConfigReader;
 import helper.Helper;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -192,5 +194,22 @@ public class BaseSteps {
             Assert.fail();
         }
 
+    }
+
+    @Then("Compare response with {string} files")
+    public void compareResponseWithFiles(String path) {
+        try {
+            String expectedResponseString = Helper.readFileAsString("src/test/java/responses/" + path + ".json");
+            DocumentContext expectedResponse = com.jayway.jsonpath.JsonPath.parse(expectedResponseString);
+
+            String actual = PrepareRequest.response.getBody().asString();
+            DocumentContext actualResponse = com.jayway.jsonpath.JsonPath.parse(actual);
+
+            Assert.assertEquals(actualResponse.jsonString(), expectedResponse.jsonString(), "Response not matched");
+
+        } catch (Exception e) {
+            logger.error("Error while comparing response with expected file", e);
+            Assert.fail("An error occurred during the response comparison");
+        }
     }
 }
