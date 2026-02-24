@@ -44,21 +44,34 @@ public class BaseSteps {
         try {
             List<Map<String, String>> map = dt.asMaps(String.class, String.class);
             JsonPath res = new JsonPath(response.getBody().asString());
+
             for (Map<String, String> value : map) {
-                logger.info("Checking Response " + value.get("path") + " field.");
-                if (Helper.getTypeOfValueResponse(value.get("path")).equals("String")) {
-                    Assert.assertEquals(res.get(value.get("path")), Helper.dataConversionString(value.get("value")));
-                } else if (Helper.getTypeOfValueResponse(value.get("path")).equals("Number")) {
-                    Assert.assertEquals(res.get(value.get("path")), Helper.dataConversionInteger(value.get("value")));
-                } else if (Helper.getTypeOfValueResponse(value.get("path")).equals("Boolean")) {
-                    Assert.assertEquals(res.get(value.get("path")), Helper.dataConversionBoolean(value.get("value")));
+                String path = value.get("path");
+                String rawValue = value.get("value");
+                String type = Helper.getTypeOfValueResponse(path);
+
+                logger.info("Checking Response {} field.", path);
+
+                Object expectedValue;
+                if ("String".equals(type)) {
+                    expectedValue = Helper.dataConversionString(rawValue);
+                } else if ("Number".equals(type)) {
+                    expectedValue = Helper.dataConversionInteger(rawValue);
+                } else if ("Boolean".equals(type)) {
+                    expectedValue = Helper.dataConversionBoolean(rawValue);
+                } else {
+                    Assert.fail("Unsupported type. path: " + path + ", type: " + type);
+                    return;
                 }
+
+                Assert.assertEquals(res.get(path), expectedValue, "Path: " + path);
             }
         } catch (Exception e) {
-            logger.error("Error Message: " + e);
+            logger.error("Error Message: {}", e.toString(), e);
             Assert.fail();
         }
     }
+
 
     @Then("Expected to see not null control")
     public void expectedToSeeNotNullControl(DataTable dt) {
@@ -210,6 +223,51 @@ public class BaseSteps {
         } catch (Exception e) {
             logger.error("Error while comparing response with expected file", e);
             Assert.fail("An error occurred during the response comparison");
+        }
+    }
+
+    @Then("Control Response Array")
+    public void controlResponseArray(DataTable dt) {
+
+        try {
+            List<Map<String, String>> map = dt.asMaps(String.class, String.class);
+            JsonPath res = new JsonPath(response.getBody().asString());
+            int size = res.getList("").size();
+
+            for (Map<String, String> value : map) {
+
+                String path = value.get("path");
+                String type = Helper.getTypeOfValueResponse("[0]." + path);
+
+                if (type.equals("String")) {
+                    for (int i = 0; i < size; i++) {
+                        logger.info("Checking rowIndex={}, path={}", i, path);
+                        Assert.assertEquals(
+                                res.get("[" + i + "]." + path),
+                                Helper.dataConversionByType(type, value.get("value"))
+                        );
+                    }
+                } else if (type.equals("Number")) {
+                    for (int i = 0; i < size; i++) {
+                        logger.info("Checking rowIndex={}, path={}", i, path);
+                        Assert.assertEquals(
+                                res.get("[" + i + "]." + path),
+                                Helper.dataConversionByType(type, value.get("value"))
+                        );
+                    }
+                } else if (type.equals("Boolean")) {
+                    for (int i = 0; i < size; i++) {
+                        logger.info("Checking rowIndex={}, path={}", i, path);
+                        Assert.assertEquals(
+                                res.get("[" + i + "]." + path),
+                                Helper.dataConversionByType(type, value.get("value"))
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error Message: " + e);
+            Assert.fail();
         }
     }
 }

@@ -9,6 +9,7 @@ import org.testng.Assert;
 import steps.PrepareRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -115,6 +116,17 @@ public class Helper {
             logger.error("Error Message: {}", String.valueOf(e));
             return null;
         }
+    }
+
+    public static Object dataConversionByType(String type, String value) {
+        if ("String".equals(type)) {
+            return dataConversionString(value);
+        } else if ("Number".equals(type)) {
+            return dataConversionInteger(value);
+        } else if ("Boolean".equals(type)) {
+            return dataConversionBoolean(value);
+        }
+        return value;
     }
 
     @Before
