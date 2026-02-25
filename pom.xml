@@ -7,7 +7,7 @@
 
     <groupId>io.github.ssmyrna</groupId>
     <artifactId>smyrna-java</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.7</version>
     <packaging>jar</packaging>
 
     <name>smyrna-java</name>
