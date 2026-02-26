@@ -4,7 +4,6 @@ import com.jayway.jsonpath.DocumentContext;
 import config.ConfigReader;
 import helper.Helper;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -267,6 +266,40 @@ public class BaseSteps {
             }
         } catch (Exception e) {
             logger.error("Error Message: " + e);
+            Assert.fail();
+        }
+    }
+
+    @Then("Database control with {string} query")
+    @Then("Database Control With {string} Query")
+    public void databaseControlWithQuery(String query, DataTable dt) {
+        try {
+            List<Map<String, String>> map = dt.asMaps(String.class, String.class);
+            net.minidev.json.JSONArray resultRows = Helper.executeQuery(query);
+
+            Assert.assertNotNull(resultRows, "Database query result is null.");
+            Assert.assertTrue(!resultRows.isEmpty(), "Database query returned no rows.");
+
+            Object firstRowObject = resultRows.get(0);
+            Assert.assertTrue(firstRowObject instanceof Map, "Unexpected query result format.");
+
+            Map<?, ?> firstRow = (Map<?, ?>) firstRowObject;
+
+            for (Map<String, String> row : map) {
+                String key = Helper.getMapValueIgnoreCase(row, "Key");
+                String expectedRaw = Helper.getMapValueIgnoreCase(row, "Value");
+
+                Assert.assertNotNull(key, "DataTable must contain Key column.");
+                logger.info("Checking DB field: {}", key);
+                Assert.assertTrue(firstRow.containsKey(key), "Query result does not contain field: " + key);
+
+                Object actualValue = firstRow.get(key);
+                Object expectedValue = Helper.dataConversionByActualValue(actualValue, expectedRaw);
+
+                Assert.assertEquals(actualValue, expectedValue, "Mismatch on field: " + key);
+            }
+        } catch (Exception e) {
+            logger.error("Error Message: {}", e.toString(), e);
             Assert.fail();
         }
     }

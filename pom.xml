@@ -7,7 +7,7 @@
 
     <groupId>io.github.ssmyrna</groupId>
     <artifactId>smyrna-java</artifactId>
-    <version>1.2.7</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <name>smyrna-java</name>
@@ -60,6 +60,7 @@
         <lombok>1.18.30</lombok>
         <jayway>2.6.0</jayway>
         <cucumber-core>7.14.0</cucumber-core>
+        <mssql-jdbc.version>12.8.1.jre11</mssql-jdbc.version>
 
         <slf4j.version>2.0.12</slf4j.version>
         <log4j2.version>2.23.1</log4j2.version>
@@ -214,6 +215,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${mssql-jdbc.version}</version>
         </dependency>
     </dependencies>
 
