@@ -1,5 +1,8 @@
 package steps;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import config.ConfigReader;
 import helper.Helper;
@@ -22,6 +25,7 @@ import static steps.PrepareRequest.response;
 
 public class BaseSteps {
     private static final Logger logger = LoggerFactory.getLogger(BaseSteps.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static RequestSpecification mockRequest;
 
@@ -187,6 +191,41 @@ public class BaseSteps {
             Assert.fail();
         }
 
+    }
+
+    @Then("Control mock request body on port {int} with")
+    public void controlMockRequestBodyOnPortWith(int port, DataTable dt) {
+        try {
+            List<Map<String, String>> map = dt.asMaps(String.class, String.class);
+            String mockUrl = ConfigReader.get("mock.url");
+            RestAssured.baseURI = mockUrl + port;
+            mockRequest = RestAssured.given();
+            mockResponse = mockRequest.when().log().all().get();
+            JsonPath jp = mockResponse.jsonPath();
+
+            for (Map<String, String> data : map) {
+                String indexValue = data.getOrDefault("index", "0");
+                int index = Integer.parseInt(indexValue);
+                String expectedBodyRaw = data.get("body");
+                Assert.assertNotNull(expectedBodyRaw, "DataTable must contain body column.");
+
+                Object actualBodyRaw = jp.get("requests[" + index + "].body");
+                JsonNode expectedBody = Helper.parseExpectedJsonBody(expectedBodyRaw);
+                JsonNode actualBody = Helper.parseActualJsonBody(actualBodyRaw);
+
+                logger.info("Checking Request Body with request index value {}", index);
+                Assert.assertEquals(
+                        actualBody,
+                        expectedBody,
+                        "Body mismatch on request index " + index +
+                                "\nExpected: " + expectedBody +
+                                "\nActual  : " + actualBody
+                );
+            }
+        } catch (Exception e) {
+            logger.error("Error Message: {}", e.toString(), e);
+            Assert.fail();
+        }
     }
 
     @Then("Mock Request Count Equal {int} on port {int}")

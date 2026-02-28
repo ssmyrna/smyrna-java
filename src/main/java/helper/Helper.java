@@ -1,5 +1,7 @@
 package helper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,7 +27,7 @@ public class Helper {
     private static final Logger logger = LoggerFactory.getLogger(Helper.class);
     public static io.restassured.path.json.JsonPath type;
     public static DocumentContext jo;
-
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     public static void jsonEdit(String path) throws Exception {
         try {
             type = new io.restassured.path.json.JsonPath(readFileAsString("src/test/java/requests/" + path + ".json"));
@@ -240,6 +242,55 @@ public class Helper {
         }
 
         return null;
+    }
+
+    public static JsonNode parseExpectedJsonBody(String expectedBodyRaw) throws JsonProcessingException {
+        String expectedBody = expectedBodyRaw == null ? "" : expectedBodyRaw.trim();
+        if (expectedBody.isEmpty()) {
+            return objectMapper.valueToTree("");
+        }
+
+        JsonNode expectedNode = objectMapper.readTree(expectedBody);
+        return unwrapStringifiedJson(expectedNode);
+    }
+
+    public static JsonNode parseActualJsonBody(Object actualBodyRaw) {
+        if (actualBodyRaw == null) {
+            return objectMapper.nullNode();
+        }
+
+        JsonNode actualNode;
+        if (actualBodyRaw instanceof String) {
+            String actualBody = ((String) actualBodyRaw).trim();
+            if (actualBody.isEmpty()) {
+                return objectMapper.valueToTree("");
+            }
+            try {
+                actualNode = objectMapper.readTree(actualBody);
+            } catch (JsonProcessingException e) {
+                return objectMapper.valueToTree(actualBodyRaw);
+            }
+        } else {
+            actualNode = objectMapper.valueToTree(actualBodyRaw);
+        }
+
+        try {
+            return unwrapStringifiedJson(actualNode);
+        } catch (JsonProcessingException e) {
+            return actualNode;
+        }
+    }
+
+    public static JsonNode unwrapStringifiedJson(JsonNode node) throws JsonProcessingException {
+        JsonNode current = node;
+        while (current != null && current.isTextual()) {
+            String text = current.asText();
+            if (text == null || text.trim().isEmpty()) {
+                return current;
+            }
+            current = objectMapper.readTree(text);
+        }
+        return current;
     }
 
     @Before
